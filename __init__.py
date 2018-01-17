@@ -1,31 +1,19 @@
 from modules import cbpi
 from modules.core.hardware import ActorBase, SensorPassive, SensorActive
 from modules.core.props import Property
-import httplib2
-from flask import request
-import base64
+from subprocess import call
 
 @cbpi.actor
-class WIFISocket(ActorBase):
+class Silvercrest(ActorBase):
 
-    b_user = Property.Text("User", configurable=True, default_value="admin" )
-    c_password = Property.Text("Password", configurable=True, default_value="")
-    a_url = Property.Text("Url", configurable=True, default_value="http://")
-    # Command so swtich wifi socket on
-    onCommand = '<?xml version="1.0" encoding="utf-8"?><SMARTPLUG id="edimax"><CMD id="setup"><Device.System.Power.State>ON</Device.System.Power.State></CMD></SMARTPLUG>'
-    # Command so swtich wifi socket off
-    offCommand = '<?xml version="1.0" encoding="utf-8"?><SMARTPLUG id="edimax"><CMD id="setup"><Device.System.Power.State>OFF</Device.System.Power.State></CMD></SMARTPLUG>'
+    a_oncode = Property.Text("Switch ON code", configurable=True, default_value="1125744" )
+    b_offcode = Property.Text("Switch OFF code", configurable=True, default_value="2045856" )
 
-    def send(self,  command):
+    def send(self,  code):
         try:
-            h = httplib2.Http(".cache")
-            auth = base64.encodestring( "%s:%s" % (self.b_user, self.c_password) )
-            headers = {'content-type': 'application/x-www-form-urlencoded', 'Authorization' : 'Basic ' + auth}
-            ## Sending http command ""
-            h.add_credentials( self.b_user, self.c_password)
-            (resp_headers, content) = h.request("%s/smartplug.cgi" % (self.a_url), "POST",  body=command, headers=headers)
+            call(["sudo /home/clemens/433Utils/RPi_utils/./codesend", code, "4 355"])
         except Exception as e:
-            self.api.app.logger.error("FAIELD to switch WIFI socket %s User: %s" % (self.url, self.user))
+            self.api.app.logger.error("FAIELD to switch 433Mhz Code: %s" % (code))
 
     def on(self, power=100):
         self.send(self.onCommand)
