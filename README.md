@@ -1,5 +1,8 @@
 # 433Mhz Socket Actor Plugin for CraftBeerPi 3.0
 
+This is an actor plugin for CraftbeerPi 3.0, which aims to provide a way to switch radio sockets on and off.
+Right now there is only one supported set, the silvercrest RCP DP3 3711-A.
+
 ## Supported 433Mhz Socket
 
 * Silvercrest RCR DP3 3711-A
